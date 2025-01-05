@@ -13,15 +13,18 @@ no longer occupied, the spot goes back into the priority queue.
 */
 public class ParkingLot {
 
+    // Name of the parking lot.
+    private final String NAME;
+
     // Stores the list of parking spots
-    public List<ParkingSpot> parkingSpots;
+    private List<ParkingSpot> parkingSpots;
 
     // Separate priority queues of motorcycle, car and commerical spots. 
     
     // Constructs a new parking lot with no parking spots
-    public ParkingLot() {
+    public ParkingLot(String name) {
         this.parkingSpots = new ArrayList<>();
-
+        this.NAME = name;
     }
 
     
