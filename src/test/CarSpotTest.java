@@ -1,6 +1,6 @@
 package test;
 
-import org.junit.Test;
+import org.junit.*;
 import static org.junit.Assert.assertEquals;
 
 /*
@@ -12,9 +12,8 @@ public class CarSpotTest {
 
     @Test
     public void constructorTest() {
-        assertEquals(3, 3);
+        assertEquals(1, 1);
     }
-
     
 }
 
