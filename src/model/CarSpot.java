@@ -1,5 +1,4 @@
 package model;
-import exception.PlateNotFoundException;
 
 /*
  * @ Mu Ye Liu, Jan 2025
@@ -9,62 +8,73 @@ import exception.PlateNotFoundException;
  */
 public class CarSpot extends ParkingSpot {
 
-    // Integer that indicates number of motorcycles parked in a car spot (0, 1, or 2)
+    // Integer that indicates number of motorcycles parked in a car spot (0, 1, or
+    // 2)
     private int motorcycleCount;
 
-    // Only used when motorcycles use the car spot
+    // Only used when motorcycles use the car spot. Basically splitting the car
+    // stall in half.
     private String licensePlate2;
 
-
-    // Constructs a Car parking spot
-    public CarSpot(int id, int distance) {
+    // Constructs an unoccupied car spot.
+    public CarSpot(int id, double distance) {
         super(id, distance);
         this.motorcycleCount = 0;
         this.licensePlate2 = "";
     }
 
-    // Sets the motorcycle occupation status. If the stall is occupied by one motorcycle, the
-    // boolean status for cars (occupied) will be true, while motorcycle count will be 1. 
-    // Input true for status if motorcycle occupies, false for leave.
-    public void setMotorcycleOccupied(boolean status, String plate) throws PlateNotFoundException {
-        // Changes the motorcycle count and status of the stall
-        // Shouldn't happen if implemented properly, but to safeguard the motorcycleCount from
-        // holding an illegal integer
-        if (status && (motorcycleCount == 0 || motorcycleCount == 1)) {
-            // Occupy case
-            occupied = status;
-            motorcycleCount++;
-            if (motorcycleCount == 0) {
-                // Case where spot is empty
+    /*
+     * The following 2 methods are to occupy or unoccupy motorcycles. To occupy spot
+     * with car,
+     * use the functions in the ParkingSpot super class.
+     */
+
+    // Occupies the car spot with motorcycle
+    // REQUIRES: the spot is not fully occupied. The motorcycleCount must be 0 or 1
+    public void occupyWithMotorcycle(String plate) {
+        // Set occupied status to true
+        occupied = true;
+        if (motorcycleCount == 0) {
+            // Empty stall case (motorcycleCount == 0)
+            licensePlate = plate;
+        } else {
+            // Case where one motorcycle is already parked in it (motorcycleCount == 1)
+            if (licensePlate.equals("")) {
+                // Another motorcycle parked in second part of stall
                 licensePlate = plate;
             } else {
-                // Case where one motorcycle is parked, but we need to determine side of stall.
-                if (licensePlate.equals("")) {
-                    licensePlate = plate;
-                } else {
-                    licensePlate2 = plate;
-                }
-            }
-        } else if (!status && (motorcycleCount == 1 || motorcycleCount == 2)) {
-            // Leave case
-            if (licensePlate.equals(plate)) {
-                licensePlate = "";
-            } else if (licensePlate2.equals(plate)) {
-                licensePlate2 = "";
-            } else {
-                throw new PlateNotFoundException();
-            }
-
-            motorcycleCount--;
-            // If there are 2 motorcycles parked, but one leaves, we do not change the status
-            if (motorcycleCount == 1) {
-                occupied = status;
+                // Another motorcycle parked in first part of stall
+                licensePlate2 = plate;
             }
         }
+
+        // Increment the motorcycleCount
+        motorcycleCount++;
+    }
+
+    // Unoccupies the car spot that a motorcycle parked in
+    // REQUIRES: the spot must not be empty (count = 1 or 2), the plate parameter
+    // must match one of: licensePlate, licensePlate2
+    public void unoccupyMotorcycle(String plate) {
+        // Car stall is half full (has only 1 motorcycle), the occupied status becomes
+        // false. The stall is free to then be occupied by both cars and motorcycles
+        if (motorcycleCount == 1) {
+            occupied = false;
+        }
+
+        // Check which part of stall the motorcycle to remove is in
+        if (licensePlate.equals(plate)) {
+            licensePlate = "";
+        } else {
+            licensePlate2 = "";
+        }
+
+        // Finally decrement motorcycleCount
+        motorcycleCount--;
     }
 
     ///// GETTER METHODS /////
-    
+
     public int getMotocycleCount() {
         return motorcycleCount;
     }

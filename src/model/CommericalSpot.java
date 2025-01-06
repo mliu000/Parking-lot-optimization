@@ -9,8 +9,8 @@ has the same features as the "base" parking spot class. Since commerical spots a
 */
 public class CommericalSpot extends ParkingSpot {
 
-    public CommericalSpot(int id, int distance) {
+    public CommericalSpot(int id, double distance) {
         super(id, distance);
     }
-    
+
 }
