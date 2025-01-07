@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import exception.InvalidPlateException;
-
 /*
  * @ Mu Ye Liu, Jan 2025
  * 
@@ -94,10 +92,10 @@ public class ParkingLot {
      * REQUIRES: the integer flag must be 0, 1 or 2
      * Throws exception if license plate string does not meet conditions 
      */
-    public void occupySpot(String plate, int flag) throws InvalidPlateException {
+    public void occupySpot(String plate, int flag) throws IllegalArgumentException {
         plate = formatPlate(plate);
         if (plate.length() < 5 || plate.length() > 7) {
-            throw new InvalidPlateException();
+            throw new IllegalArgumentException("Plate is too long or short");
         }
 
         switch (flag) {
@@ -114,6 +112,14 @@ public class ParkingLot {
                 commericalSpotToOccupy.occupy(plate);
                 break;
         }
+    }
+
+    /*
+     * Unoccupies spot based on given license plate. 
+     * Throws exception if plate cannot be found
+     */
+    public void unoccupySpot(String plate) {
+        plate = formatPlate(plate);
     }
 
     /*
