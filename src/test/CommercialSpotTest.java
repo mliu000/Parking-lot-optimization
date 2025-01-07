@@ -47,7 +47,7 @@ public class CommercialSpotTest {
         plates.add("BC1234");
         plates.add("CG3241");
 
-        for (String plate : plates) {
+        for (String plate: plates) {
             commericalSpot.occupy(plate);
             assertEquals(plate, commericalSpot.getLicensePlate());
             assertTrue(commericalSpot.getOccupiedStatus());

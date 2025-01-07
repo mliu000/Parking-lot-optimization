@@ -12,6 +12,12 @@ import org.junit.Test;
 
 import model.MotorcycleSpot;
 
+/*
+ * @ Mu Ye Liu, Jan 2025
+ * 
+Tests the functionality of the commercial parking spot class in JUnit 4. 
+Same as the commerical spot test class because the classes are essentially the same
+*/
 public class MotorcycleSpotTest {
 
     public MotorcycleSpot motorcycleSpot;
@@ -42,11 +48,11 @@ public class MotorcycleSpotTest {
     @Test
     public void occupyAndUnoccupyTest() {
         List<String> plates = new ArrayList<>();
-        plates.add("AB1234");
-        plates.add("BC1234");
-        plates.add("CG3241");
+        plates.add("Y00000");
+        plates.add("Y00001");
+        plates.add("Y12345");
 
-        for (String plate : plates) {
+        for (String plate: plates) {
             motorcycleSpot.occupy(plate);
             assertEquals(plate, motorcycleSpot.getLicensePlate());
             assertTrue(motorcycleSpot.getOccupiedStatus());
