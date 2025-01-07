@@ -10,8 +10,9 @@ package model;
 public abstract class ParkingSpot {
 
     /*
-     * License plate number of parked vehicle, omitting spaces and must be all upper case
-     * Empty string if spot is vacant.
+     * License plate number of parked vehicle
+     * Requirements: No spaces, must be all caps, 5-7 characters long including all chars and nums. 
+     * Empty string if spot is vacant. 
      */
     protected String licensePlate;
 
@@ -40,7 +41,7 @@ public abstract class ParkingSpot {
     }
 
     // Occupies the spot and sets the license plate
-    // REQUIRES: The spot is not already occupied
+    // REQUIRES: The spot is not already occupied, plate must meet requirements
     public void occupy(String plate) {
         licensePlate = plate;
         occupied = true;

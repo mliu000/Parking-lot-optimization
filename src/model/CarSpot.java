@@ -13,7 +13,7 @@ public class CarSpot extends ParkingSpot {
     private int motorcycleCount;
 
     // Only used when motorcycles use the car spot. Basically splitting the car
-    // stall in half.
+    // stall in half. Has the same requirements as licensePlate in ParkingSpot super class
     private String licensePlate2;
 
     // Constructs an unoccupied car spot.
@@ -30,7 +30,8 @@ public class CarSpot extends ParkingSpot {
      */
 
     // Occupies the car spot with motorcycle
-    // REQUIRES: the spot is not fully occupied. The motorcycleCount must be 0 or 1
+    // REQUIRES: the spot is not fully occupied. The motorcycleCount must be 0 or 1, plate
+    //           must meet requirements.
     public void occupyWithMotorcycle(String plate) {
         // Set occupied status to true
         occupied = true;
