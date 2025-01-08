@@ -37,7 +37,7 @@ public class CarSpotTest {
         assertFalse(carSpot.getOccupiedStatus());
         assertTrue(carSpot.getLicensePlate().equals("") && 
             carSpot.getLicensePlate2().equals(""));
-        assertEquals(0, carSpot.getMotocycleCount());
+        assertEquals(0, carSpot.getMotorcycleCount());
     }
 
     // Test: Occupies and unoccupies a spot with a car 3 times
@@ -52,13 +52,13 @@ public class CarSpotTest {
             assertTrue(carSpot.getOccupiedStatus());
             assertEquals(carPlate, carSpot.getLicensePlate());
             assertEquals("", carSpot.getLicensePlate2());
-            assertEquals(0, carSpot.getMotocycleCount());
+            assertEquals(0, carSpot.getMotorcycleCount());
 
             carSpot.unoccupy();
             assertFalse(carSpot.getOccupiedStatus());
             assertEquals("", carSpot.getLicensePlate());
             assertEquals("", carSpot.getLicensePlate2());
-            assertEquals(0, carSpot.getMotocycleCount());
+            assertEquals(0, carSpot.getMotorcycleCount());
         }
     }
 
@@ -75,14 +75,14 @@ public class CarSpotTest {
         assertTrue(carSpot.getOccupiedStatus());
         assertEquals("Y00000", carSpot.getLicensePlate());
         assertEquals("", carSpot.getLicensePlate2());
-        assertEquals(1, carSpot.getMotocycleCount());
+        assertEquals(1, carSpot.getMotorcycleCount());
 
         // Occupy second motorcycle
         carSpot.occupyWithMotorcycle("Y12345");
         assertTrue(carSpot.getOccupiedStatus());
         assertEquals("Y00000", carSpot.getLicensePlate());
         assertEquals("Y12345", carSpot.getLicensePlate2());
-        assertEquals(2, carSpot.getMotocycleCount());
+        assertEquals(2, carSpot.getMotorcycleCount());
     }
 
     /*
@@ -102,7 +102,7 @@ public class CarSpotTest {
         assertTrue(carSpot.getOccupiedStatus());
         assertEquals("Y34245", carSpot.getLicensePlate());
         assertEquals("Y12345", carSpot.getLicensePlate2());
-        assertEquals(2, carSpot.getMotocycleCount());
+        assertEquals(2, carSpot.getMotorcycleCount());
     }
 
     // Initializes fully parked spot with 2 motorcycles, removes motorcycle in slot 1
@@ -118,7 +118,7 @@ public class CarSpotTest {
         assertTrue(carSpot.getOccupiedStatus());
         assertEquals("", carSpot.getLicensePlate());
         assertEquals("Y12345", carSpot.getLicensePlate2());
-        assertEquals(1, carSpot.getMotocycleCount());
+        assertEquals(1, carSpot.getMotorcycleCount());
     }
 
     // Initializes fully parked spot with 2 motorcycles, removes motorcycle in slot 2
@@ -134,7 +134,7 @@ public class CarSpotTest {
         assertTrue(carSpot.getOccupiedStatus());
         assertEquals("Y00000", carSpot.getLicensePlate());
         assertEquals("", carSpot.getLicensePlate2());
-        assertEquals(1, carSpot.getMotocycleCount());
+        assertEquals(1, carSpot.getMotorcycleCount());
     }
 
     // Sets up case where you have motorcycle in spot 1, then try to remove it.
@@ -149,7 +149,7 @@ public class CarSpotTest {
         assertFalse(carSpot.getOccupiedStatus());
         assertEquals("", carSpot.getLicensePlate());
         assertEquals("", carSpot.getLicensePlate2());
-        assertEquals(0, carSpot.getMotocycleCount());
+        assertEquals(0, carSpot.getMotorcycleCount());
     }
 
     // Sets up case where you have motorcycle in spot 2, then try to remove it.
@@ -166,7 +166,7 @@ public class CarSpotTest {
         assertFalse(carSpot.getOccupiedStatus());
         assertEquals("", carSpot.getLicensePlate());
         assertEquals("", carSpot.getLicensePlate2());
-        assertEquals(0, carSpot.getMotocycleCount());
+        assertEquals(0, carSpot.getMotorcycleCount());
     }
 
 
