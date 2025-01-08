@@ -3,10 +3,7 @@ package test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.PriorityQueue;
 
 import org.junit.Before;
@@ -95,7 +92,7 @@ public class ParkingLotTest {
         }
     }
 
-    ///// HELPER FUNCTIONS
+    ///// HELPER METHOD
     
     // Helper that checks the size of the dynamic fields that store parking spots
     public void checkSpotsSize(ParkingLot lot, int a, int b, int c, int d, int e) {
@@ -105,9 +102,4 @@ public class ParkingLotTest {
         assertEquals(d, lot.getVacantCommericalSpots().size());
         assertEquals(e, lot.getHalfFullCarSpots().size());
     }
-
-
-
-
-    
 }
