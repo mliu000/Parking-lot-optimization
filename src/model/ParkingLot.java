@@ -150,22 +150,21 @@ public class ParkingLot {
     public ParkingSpot unoccupySpot(String plate) throws IllegalArgumentException {
         plate = formatPlate(plate);
         // Iterate through set of all parking spot to see if the spot can be found
-        for (Map.Entry<Integer, ParkingSpot> entry: parkingSpots.entrySet()) {
-            // Check to see whether or not motorcycle is parked in car spot
-            ParkingSpot spot = entry.getValue();
-            if (spot instanceof CarSpot) {
-                CarSpot carSpot = (CarSpot) spot;
+        for (ParkingSpot spot : parkingSpots.values()) {
+            if (spot instanceof CarSpot carSpot) {
+                // Case where you unoccupy motorcycle from car
                 if (carSpot.getMotorcycleCount() > 0 && (carSpot.getLicensePlate().equals(plate) || 
                     carSpot.getLicensePlate2().equals(plate))) {
                     carSpot.unoccupyMotorcycle(plate);
+                    addSpotBackToPriorityQueue(carSpot, true);
                     return carSpot;
                 }
-            } else {
-                if (spot.getLicensePlate().equals(plate)) {
-                    spot.unoccupy();
-                    addSpotBackToPriorityQueue(spot);
-                    return spot;
-                }
+            } 
+            // Regular case
+            if (spot.getLicensePlate().equals(plate)) {
+                spot.unoccupy();
+                addSpotBackToPriorityQueue(spot, false);
+                return spot;
             }
         }
         // If no spot found, return null
@@ -184,7 +183,7 @@ public class ParkingLot {
      * as well as capitalize all inputted letters. Throws exception if plate is too long or short
     */
     private String formatPlate(String input) throws IllegalArgumentException {
-        input = input.replaceAll("[^A-Z0-9]", "");
+        input = input.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
         if (input.length() < 5 || input.length() > 7) {
             throw new IllegalArgumentException("Plate is too long or short");
         }
@@ -199,19 +198,36 @@ public class ParkingLot {
         return parkingSpots.get(spotId);
     }
 
-    // Adds previously occupied spot back into priority queue
-    private void addSpotBackToPriorityQueue(ParkingSpot spot) {
-        if (spot instanceof CarSpot) {
+    /*
+     * Adds previously occupied spot back into priority queue
+     * Flag: false = regular case, true = case where you unoccupy motorcycle spot from car
+     * 
+     * REQUIRES: Must first unoccupy spot first in caller method before calling this method.
+    */
+    private void addSpotBackToPriorityQueue(ParkingSpot spot, boolean flag) {
+        if (flag) {
             CarSpot carSpot = (CarSpot) spot;
-            vacantCarSpots.add(carSpot);
-        } else if (spot instanceof MotorcycleSpot) {
-            MotorcycleSpot motorcycleSpot = (MotorcycleSpot) spot;
-            vacantMotorcycleSpots.add(motorcycleSpot);
-        } else { // Commercial spot
-            CommericalSpot commericalSpot = (CommericalSpot) spot;
-            vacantCommericalSpots.add(commericalSpot);
+            if (carSpot.getMotorcycleCount() == 1) {
+                halfFullCarSpots.add(carSpot);
+            } else {
+                halfFullCarSpots.remove(carSpot);
+                vacantCarSpots.add(carSpot);
+            }
+        } else {
+            if (spot instanceof CarSpot) {
+                CarSpot carSpot = (CarSpot) spot;
+                vacantCarSpots.add(carSpot);
+            } else if (spot instanceof MotorcycleSpot) {
+                MotorcycleSpot motorcycleSpot = (MotorcycleSpot) spot;
+                vacantMotorcycleSpots.add(motorcycleSpot);
+            } else { // Commercial spot
+                CommericalSpot commericalSpot = (CommericalSpot) spot;
+                vacantCommericalSpots.add(commericalSpot);
+            }
         }
     }
+
+    
 
     /* 
      * Occupies car spot with motorcycle. Always retrieves furthest half full spot car first.
@@ -228,12 +244,12 @@ public class ParkingLot {
                 return null; // Exceptional case where there are no half full or full spots left
             }
             
-            emptyCarSpot.occupy(plate);
+            emptyCarSpot.occupyWithMotorcycle(plate);
             halfFullCarSpots.add(emptyCarSpot);
             return emptyCarSpot; // Case where there are no half full spots, but there are empty spots
         }
 
-        carSpotHalfOccupied.occupy(plate);
+        carSpotHalfOccupied.occupyWithMotorcycle(plate);
         return carSpotHalfOccupied; // Case where there are half full spots
     }
 
