@@ -76,11 +76,6 @@ public class CarSpot extends ParkingSpot {
 
     ///// GETTER METHODS /////
 
-    public int getMotorcycleCount() {
-        return motorcycleCount;
-    }
-
-    public String getLicensePlate2() {
-        return licensePlate2;
-    }
+    public int getMotorcycleCount() { return motorcycleCount; }
+    public String getLicensePlate2() {return licensePlate2; }
 }

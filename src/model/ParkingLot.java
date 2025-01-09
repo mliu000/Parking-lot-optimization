@@ -1,7 +1,7 @@
 package model;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.PriorityQueue;
 
 /*
@@ -25,6 +25,8 @@ public class ParkingLot {
      */
     private HashMap<Integer, ParkingSpot> parkingSpots;
 
+    private HashSet<String> licensePlates;
+
     /*
      * 4 separate Max Heap priority queues to store vacant parking spots: They are the following: 
      * - One that stores the vacant car spot
@@ -44,6 +46,7 @@ public class ParkingLot {
     public ParkingLot(String name) {
         this.name = name;
         this.parkingSpots = new HashMap<>();
+        this.licensePlates = new HashSet<>();
         this.vacantCarSpots = new PriorityQueue<>((a, b) 
             -> Double.compare(b.getDistance(), a.getDistance()));
         this.vacantMotorcycleSpots = new PriorityQueue<>((a, b) 
@@ -84,14 +87,12 @@ public class ParkingLot {
                 parkingSpots.put(id, newMotorcycleSpot);
                 vacantMotorcycleSpots.add(newMotorcycleSpot);
                 return newMotorcycleSpot;
-            case 2: 
+            default: // Case 2 
                 CommericalSpot newCommercialSpot = new CommericalSpot(id, distance);
                 parkingSpots.put(id, newCommercialSpot);
                 vacantCommericalSpots.add(newCommercialSpot);
                 return newCommercialSpot;
-        } 
-
-        return null; // Placeholder, shouldn't happen
+        }
     }
 
     /*
@@ -104,12 +105,13 @@ public class ParkingLot {
      * The input license plate will be formatted to ATTEMPT to meet the conditions
      * 
      * REQUIRES: the integer flag must be 0, 1 or 2
-     * Throws exception if license plate doesn't meet reqs
+     * Throws exception if license plate doesn't meet reqs, or if plate already exists
      * 
      * Returns the spot that was occupied if success, null if spot is full
      */
     public ParkingSpot occupySpot(String plate, int flag) throws IllegalArgumentException {
-        plate = formatPlate(plate); // Throws IllegalArgumentException
+        plate = formatPlate(plate); // Potentially throws IllegalArgumentException
+        checkDuplicatePlate(plate); // Potentially throws IllegalArgumentException
 
         switch (flag) {
             case 0:
@@ -118,6 +120,7 @@ public class ParkingLot {
                     return null;
                 }
                 carSpotToOccupy.occupy(plate);
+                licensePlates.add(plate);
                 return carSpotToOccupy;
             case 1:
                 MotorcycleSpot motorcycleSpotToOccupy = vacantMotorcycleSpots.poll();
@@ -126,20 +129,75 @@ public class ParkingLot {
                     if (carSpotUsedForMotorcycle == null) {
                         return null;
                     }
+                    licensePlates.add(plate);
                     return carSpotUsedForMotorcycle;
                 }
                 motorcycleSpotToOccupy.occupy(plate); 
+                licensePlates.add(plate);
                 return motorcycleSpotToOccupy;
-            case 2:
+            default:
                 CommericalSpot commericalSpotToOccupy = vacantCommericalSpots.poll();
                 if (commericalSpotToOccupy == null) {
                     return null;
                 }
                 commericalSpotToOccupy.occupy(plate);
+                licensePlates.add(plate);
                 return commericalSpotToOccupy;
         }
+    }
 
-        return null; // Placeholder, shouldn't happen
+    /*
+     * Manually occupies a spot based on given spot id and license plate by searching hashmap
+     * Returns the parking spot that is just occupied, for null if no spot if found and occupied
+     * Like the previous function, throws exception if plate does not meet requirements
+     * Also, manually remove spot from associated priority queue
+     * 
+     * Boolean flag: true if you want to occupy car spot with motorcycle, false otherwise
+     */
+    public ParkingSpot manuallyOccupy(int id, String plate, boolean flag) throws IllegalArgumentException {
+        plate = formatPlate(plate); // Potentially throws IllegalArgumentException
+        ParkingSpot spotToOccupy = findParkingSpot(id);
+        if (spotToOccupy == null) { // Id not found
+            return null;
+        }
+
+        if (spotToOccupy.getOccupiedStatus()) {
+            // Spot is marked as occupied
+            if (spotToOccupy instanceof CarSpot carSpot && carSpot.getMotorcycleCount() == 1 && flag) {
+                // Wants to occupy half full car spot with motorcycle
+                carSpot.occupyWithMotorcycle(plate);
+                halfFullCarSpots.remove(carSpot);
+            } else {
+                // Other, inoperable case
+                return null;
+            }
+        } else {
+            // Spot is not marked as occupied
+            if (spotToOccupy instanceof CarSpot carSpot) {
+                // The spot to occupy is a car spot
+                if (flag) {
+                    // Occupy empty car spot with motorcycle
+                    carSpot.occupyWithMotorcycle(plate);
+                    vacantCarSpots.remove(carSpot);
+                    halfFullCarSpots.add(carSpot);
+                } else {
+                    // Occupy with car
+                    carSpot.occupy(plate);
+                    vacantCarSpots.remove(carSpot);
+                }
+            } else if (spotToOccupy instanceof MotorcycleSpot) {
+                // The spot to occupy is a motorcycle spot
+                spotToOccupy.occupy(plate);
+                vacantMotorcycleSpots.remove(spotToOccupy);
+            } else { 
+                // The spot to occupy is commerical spot
+                spotToOccupy.occupy(plate);
+                vacantCommericalSpots.remove(spotToOccupy);
+            }
+        }
+
+        licensePlates.add(plate);
+        return spotToOccupy;
     }
 
     /*
@@ -157,6 +215,7 @@ public class ParkingLot {
                     carSpot.getLicensePlate2().equals(plate))) {
                     carSpot.unoccupyMotorcycle(plate);
                     addSpotBackToPriorityQueue(carSpot, true);
+                    licensePlates.remove(plate);
                     return carSpot;
                 }
             } 
@@ -164,6 +223,7 @@ public class ParkingLot {
             if (spot.getLicensePlate().equals(plate)) {
                 spot.unoccupy();
                 addSpotBackToPriorityQueue(spot, false);
+                licensePlates.remove(plate);
                 return spot;
             }
         }
@@ -188,6 +248,16 @@ public class ParkingLot {
             throw new IllegalArgumentException("Plate is too long or short");
         }
         return input;
+    }
+
+    /* 
+     * Checks to see whether or not license plate is already in parking lot system.
+     * Throws exception if yes
+    */
+    private void checkDuplicatePlate(String plate) throws IllegalArgumentException {
+        if (licensePlates.contains(plate)) {
+            throw new IllegalArgumentException("Plate already exists");
+        }
     }
 
     /*
@@ -227,12 +297,9 @@ public class ParkingLot {
         }
     }
 
-    
-
     /* 
      * Occupies car spot with motorcycle. Always retrieves furthest half full spot car first.
-     * If no half full spots available, get 
-     * Throws exception if plate does not meet requirements
+     * If no half full spots available, get full spots
      * 
      * Returns the spot that was occupied
      */
@@ -257,6 +324,7 @@ public class ParkingLot {
     
     public String getName() { return name;}
     public HashMap<Integer, ParkingSpot> getParkingSpots() { return parkingSpots; }
+    public HashSet<String> getLicensePlates() { return licensePlates; }
     public PriorityQueue<CarSpot> getVacantCarSpots() { return vacantCarSpots; }
     public PriorityQueue<CommericalSpot> getVacantCommericalSpots() { return vacantCommericalSpots; }
     public PriorityQueue<MotorcycleSpot> getVacantMotorcycleSpots() { return vacantMotorcycleSpots; }

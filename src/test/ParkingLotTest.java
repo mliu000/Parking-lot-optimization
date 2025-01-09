@@ -3,6 +3,7 @@ package test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.PriorityQueue;
@@ -67,9 +68,12 @@ public class ParkingLotTest {
         ParkingLot emptyLot = new ParkingLot("Lot 0");
         assertEquals("Lot 0", emptyLot.getName());
         checkVacantSpotCounts(emptyLot, 0, 0, 0, 0, 0);
+        assertTrue(emptyLot.getLicensePlates().isEmpty());
 
         // Tests the sample spot above
         checkVacantSpotCounts(parkingLot, 15, 6, 5, 4, 0);
+        assertTrue(parkingLot.getLicensePlates().isEmpty());
+
 
         // Attempts to add spot with duplicate id
         ParkingSpot newSpot = parkingLot.addParkingSpot(12, 199, 2);
@@ -100,6 +104,24 @@ public class ParkingLotTest {
             CommericalSpot spot = vacantCommericalSpots.poll();
             assertEquals(i, spot.getId());
         }
+        // Half occupies 2 car spots with motorcycles to fill the halfFullCarSpot priority queue
+        // Needs to create a new parking lot without any motorcycle spots
+        ParkingLot parkingLot2 = new ParkingLot("Lot 2");
+        // Adds the car spots
+        int[] carSpotIds = {11, 12, 13, 14, 15, 16};
+        int[] carSpotDists = {100, 101, 108, 106, 109, 104};
+        for (int i = 0; i < 6; i++) {
+            parkingLot2.addParkingSpot(carSpotIds[i], carSpotDists[i], 0);
+        }
+        // Occupy 3 spots
+        String[] licensePlates = {"Y00000", "Y00001", "Y00002"};
+        for (int i = 0; i < 3; i++) {
+            parkingLot2.occupySpot(licensePlates[i], 1);
+        }
+        parkingLot2.unoccupySpot("Y00001");
+        assertEquals(15, parkingLot2.getHalfFullCarSpots().poll().getId());
+        assertEquals(13, parkingLot2.getHalfFullCarSpots().poll().getId());
+        
     }
 
     /*
@@ -107,20 +129,35 @@ public class ParkingLotTest {
      */
     @Test
     public void occupySpotTest() {
+        ParkingLot emptyLot = new ParkingLot("empty lot");
+
         // Occupy car spot with car
+        // Case 1: car spot exists
         ParkingSpot carSpot1 = parkingLot.occupySpot("EJ323N", 0);
         checkVacantSpotCounts(parkingLot, 15, 5, 5, 4, 0);
         checkParkingSpotParameters(carSpot1, true, "EJ323N");
+        assertEquals(1, parkingLot.getLicensePlates().size());
+        // Case 2: no spots exists:
+        ParkingSpot carSpotE1 = emptyLot.occupySpot("EJ322N", 0);
+        assertNull(carSpotE1);
 
         // Occupy motorcycle spot with motorcycle
         ParkingSpot motorcycleSpot1 = parkingLot.occupySpot("Y00342", 1);
         checkVacantSpotCounts(parkingLot, 15, 5, 4, 4, 0);
         checkParkingSpotParameters(motorcycleSpot1, true, "Y00342");
+        assertEquals(2, parkingLot.getLicensePlates().size());
+        // Case 2: no spots exists:
+        ParkingSpot motorcycleSpotE1 = emptyLot.occupySpot("Y87242", 1);
+        assertNull(motorcycleSpotE1);
         
         // Occupy commercial spot with commercial vehicle
         ParkingSpot commercialSpot1 = parkingLot.occupySpot("BR4252", 2);
         checkVacantSpotCounts(parkingLot, 15, 5, 4, 3, 0);
         checkParkingSpotParameters(commercialSpot1, true, "BR4252");
+        assertEquals(3, parkingLot.getLicensePlates().size());
+        // Case 2: no spots exists:
+        ParkingSpot commercialSpotE1 = emptyLot.occupySpot("RT8239", 2);
+        assertNull(commercialSpotE1);
 
         // Occupy car spot with motorcycle: 3 cases, empty and half-full (2 sides), create new lot
         ParkingLot lotWithoutMotorcycleSpot = new ParkingLot("Lot no motorcycles");
@@ -128,40 +165,145 @@ public class ParkingLotTest {
         lotWithoutMotorcycleSpot.addParkingSpot(112, 104, 0);
         lotWithoutMotorcycleSpot.addParkingSpot(113, 102, 0);
         // Case 1: empty car spot
-        CarSpot carSpot2 = (CarSpot) lotWithoutMotorcycleSpot.occupySpot("Y12345", 1);
+        CarSpot carSpot2 = (CarSpot) lotWithoutMotorcycleSpot.occupySpot("Y  12345", 1);
         checkVacantSpotCounts(lotWithoutMotorcycleSpot, 3, 2, 0, 0, 1);
         checkCarSpotParameters(carSpot2, true, "Y12345", "", 1);
+        assertEquals(1, lotWithoutMotorcycleSpot.getLicensePlates().size());
         // Case 2: half full spot (slot 1 already occupied)
         CarSpot carSpot3 = (CarSpot) lotWithoutMotorcycleSpot.occupySpot("Y23456", 1);
         checkVacantSpotCounts(lotWithoutMotorcycleSpot, 3, 2, 0, 0, 0);
         checkCarSpotParameters(carSpot3, true, "Y12345", "Y23456", 2);
+        assertEquals(2, lotWithoutMotorcycleSpot.getLicensePlates().size());
         // Case 3: half full spot (slot 2 already occupied)
         CarSpot carSpot4 = (CarSpot) lotWithoutMotorcycleSpot.unoccupySpot("Y12345");
         checkVacantSpotCounts(lotWithoutMotorcycleSpot, 3, 2, 0, 0, 1);
         checkCarSpotParameters(carSpot4, true, "", "Y23456", 1);
+        assertEquals(1, lotWithoutMotorcycleSpot.getLicensePlates().size());
         CarSpot carSpot5 = (CarSpot) lotWithoutMotorcycleSpot.occupySpot("y00000", 1);
         checkCarSpotParameters(carSpot5, true, "Y00000", "Y23456", 2);
+        assertEquals(2, lotWithoutMotorcycleSpot.getLicensePlates().size());
 
         // License plate is invalid (too long)
         try {
             parkingLot.occupySpot("fjkdjfa%s%", 0);
             fail();
         } catch (IllegalArgumentException e) {
-            // Nothing
+            if (e.getMessage() == "Plate is too long or short") {
+                // Pass
+            } else {
+                fail(); // Fail if exception is thrown for wrong reason
+            }
         }
         // License plate is too short
         try {
             parkingLot.occupySpot("jfk2#@$", 0);
             fail();
         } catch (IllegalArgumentException e) {
-            // Nothing
+            if (e.getMessage() == "Plate is too long or short") {
+                // Pass
+            } else {
+                fail(); // Fail if exception is thrown for wrong reason
+            }
         } 
+        // License Plate already exists.
+        try {
+            parkingLot.occupySpot("EJ323N", 0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage() == "Plate already exists") {
+                // Pass
+            } else {
+                fail();
+            }
+        }
         // License plate is valid
         try {
             parkingLot.occupySpot("fjk993", 0);
         } catch (IllegalArgumentException e) {
             fail();
         }
+    }
+
+    // Tests the manually occupy method
+    @Test
+    public void manuallyOccupyTest() {
+        // Successful cases
+        // Case 1: attempt to occupy spot with corresponding vehicle
+        // - car
+        CarSpot carSpot1 = (CarSpot) parkingLot.manuallyOccupy(12, "ACG324", false);
+        checkCarSpotParameters(carSpot1, true, "ACG324", "", 0);
+        assertEquals(12, carSpot1.getId());
+        assertFalse(parkingLot.getVacantCarSpots().contains(carSpot1));
+        checkVacantSpotCounts(parkingLot, 15, 5, 5, 4, 0);
+        // - motorcycle
+        MotorcycleSpot motorcycleSpot1 = (MotorcycleSpot) 
+                    parkingLot.manuallyOccupy(20, "Y12355", false);
+        checkParkingSpotParameters(motorcycleSpot1, true, "Y12355");
+        assertEquals(20, motorcycleSpot1.getId());
+        assertFalse(parkingLot.getVacantMotorcycleSpots().contains(motorcycleSpot1));
+        checkVacantSpotCounts(parkingLot, 15, 5, 4, 4, 0);
+        // - commercial 
+        CommericalSpot commercialSpot1 = (CommericalSpot) 
+                    parkingLot.manuallyOccupy(31, "GE3244", false);
+        checkParkingSpotParameters(commercialSpot1, true, "GE3244");
+        assertEquals(31, commercialSpot1.getId());
+        assertFalse(parkingLot.getVacantCommericalSpots().contains(commercialSpot1));
+        checkVacantSpotCounts(parkingLot, 15, 5, 4, 3, 0);
+        // Case 2: attempt to occupy empty car spot with motorcycle
+        CarSpot carSpot2 = (CarSpot) parkingLot.manuallyOccupy(11, "Y99999", true);
+        checkCarSpotParameters(carSpot2, true, "Y99999", "", 1);
+        assertFalse(parkingLot.getVacantCarSpots().contains(carSpot2));
+        assertTrue(parkingLot.getHalfFullCarSpots().contains(carSpot2));
+        checkVacantSpotCounts(parkingLot, 15, 4, 4, 3, 1);
+        // Case 2: attempt to occupy half full car spot with motorcycle
+        // - motorcycle already in slot 1
+        CarSpot carSpot3 = (CarSpot) parkingLot.manuallyOccupy(11, "Y11111", true);
+        checkCarSpotParameters(carSpot3, true, "Y99999", "Y11111", 2);
+        assertFalse(parkingLot.getVacantCarSpots().contains(carSpot3));
+        assertFalse(parkingLot.getHalfFullCarSpots().contains(carSpot3));
+        checkVacantSpotCounts(parkingLot, 15, 4, 4, 3, 0);
+        // - motorcycle already in slot 2
+        parkingLot.unoccupySpot("Y99999");
+        checkCarSpotParameters(carSpot3, true, "", "Y11111", 1);
+        CarSpot carSpot4 = (CarSpot) parkingLot.manuallyOccupy(11, "Y22222", true);
+        checkCarSpotParameters(carSpot4, true, "Y22222", "Y11111", 2);
+        assertFalse(parkingLot.getVacantCarSpots().contains(carSpot4));
+        assertFalse(parkingLot.getHalfFullCarSpots().contains(carSpot4));
+        checkVacantSpotCounts(parkingLot, 15, 4, 4, 3, 0);
+        assertEquals(5, parkingLot.getLicensePlates().size());
+
+        // Unsuccessful Cases
+        // Case 1: license plate invalid, throws exception
+        try {
+            parkingLot.manuallyOccupy(11, "Y22222", true);
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage() == "Plate already exists") {
+                // Pass
+            } else {
+                fail();
+            }
+        }
+        // Case 2: license plate too short, throws exception
+        try {
+            parkingLot.manuallyOccupy(11, "Y222#@$#@  ", true);
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage() == "Plate is too long or short") {
+                // Pass
+            } else {
+                fail();
+            }
+        }
+        // Case 2: Id not found
+        ParkingSpot spotNotFound = parkingLot.manuallyOccupy(44, "Y22222", true);
+        assertNull(spotNotFound);
+        // Case 3: Tries to occupy spot that is already occupied (regular case)
+        parkingLot.manuallyOccupy(14, "JK899L", false);
+        CarSpot carSpot11 = (CarSpot) parkingLot.manuallyOccupy(14, "NP342M", false);
+        assertNull(carSpot11);
+        // Case 4: Motorcycle tries to occupy occupy full car spot
+        CarSpot carSpot12 = (CarSpot) parkingLot.manuallyOccupy(11, "NP342M", true);
+        assertNull(carSpot12);
+
     }
 
     // Tests the unoccupy method (both regular case and unoccupying motorcycle from car spot)
@@ -228,12 +370,23 @@ public class ParkingLotTest {
         CarSpot carSpot14 = (CarSpot) lotWithoutMotorcycleSpot.unoccupySpot("Y12345");
         checkCarSpotParameters(carSpot14, false, "", "", 0);
         checkVacantSpotCounts(lotWithoutMotorcycleSpot, 3, 3, 0, 0, 0);
-
-
-
-
-
     }
+
+    // Tests changing the parking lot name
+    @Test
+    public void changeLotNameTest() {
+        parkingLot.changeLotName("name changed");
+        assertEquals("name changed", parkingLot.getName());
+    }
+
+    // Find parking spot test
+    @Test
+    public void findParkingSpotTest() {
+        parkingLot.occupySpot("EJ323N", 0);
+        ParkingSpot spotFound = parkingLot.findParkingSpot(15);
+        checkParkingSpotParameters(spotFound, true, "EJ323N");
+    }
+
     ///// HELPER METHODs /////
     
     // Helper that checks the size of the dynamic fields that store parking spots

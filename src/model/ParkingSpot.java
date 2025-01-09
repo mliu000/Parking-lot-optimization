@@ -62,19 +62,8 @@ public abstract class ParkingSpot {
 
     ///// GETTER METHODS /////
 
-    public double getDistance() {
-        return distance;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public boolean getOccupiedStatus() {
-        return occupied;
-    }
-
-    public String getLicensePlate() {
-        return licensePlate;
-    }
+    public double getDistance() { return distance; }
+    public int getId() { return id; }
+    public boolean getOccupiedStatus() { return occupied; }
+    public String getLicensePlate() { return licensePlate; }
 }
