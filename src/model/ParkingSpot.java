@@ -3,9 +3,8 @@ package model;
 /*
  @ Mu Ye Liu, Jan 2025
 
- The parking spot class, as well as its inheritors, are essentially the nodes of the disjoint sets.
- Once a parking spot is occupied, it becomes rooted to the next closest spot. If the parked vehicle
- leaves the spot, the disjoint set
+ The parking spot class, which represents an individual parking spot. It has a distinct id, distance 
+ from entrance, and occupied status. Also, it records the license plate of the vehicle parked in it.
  */
 public abstract class ParkingSpot {
 
@@ -17,7 +16,7 @@ public abstract class ParkingSpot {
     protected String licensePlate;
 
     // Number/Id of the parking spot
-    protected int id;
+    protected final int id;
 
     /*
      * distance from the entrance (units are not specified as it is context
@@ -52,12 +51,6 @@ public abstract class ParkingSpot {
     public void unoccupy() {
         licensePlate = "";
         occupied = false;
-    }
-
-    // If the parking lot undergoes a id overhaul, the id can be changed with that
-    // method
-    public void changeId(int newId) {
-        id = newId;
     }
 
     ///// GETTER METHODS /////

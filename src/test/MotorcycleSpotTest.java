@@ -37,13 +37,6 @@ public class MotorcycleSpotTest {
         assertEquals("", motorcycleSpot.getLicensePlate());
     }
 
-    // Test: Changes the id of the spot and checks for output
-    @Test
-    public void changeIdTest() {
-        motorcycleSpot.changeId(101);
-        assertEquals(101, motorcycleSpot.getId());
-    }
-
     // Tests: Occupy spot with motorcycle, then unoccupy it (x3)
     @Test
     public void occupyAndUnoccupyTest() {

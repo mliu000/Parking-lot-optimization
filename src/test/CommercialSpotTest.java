@@ -32,13 +32,6 @@ public class CommercialSpotTest {
         assertEquals("", commericalSpot.getLicensePlate());
     }
 
-    // Test: Changes the id of the spot and checks for output
-    @Test
-    public void changeIdTest() {
-        commericalSpot.changeId(101);
-        assertEquals(101, commericalSpot.getId());
-    }
-
     // Tests: Occupy spot with commercial vehicle, then unoccupy it (x3)
     @Test
     public void occupyAndUnoccupyTest() {
