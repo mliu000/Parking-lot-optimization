@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 /*
  @ Mu Ye Liu, Jan 2025
 
@@ -22,7 +24,7 @@ public class ShortestPathFinder {
     }
 
     // find the shortest path given start and end vertices.
-    public ShortestPath findShortestPath(ParkingLotGraph graph) {
+    public List<String> findShortestPath(ParkingLotGraph graph) {
         return null; // stub
     }
 }

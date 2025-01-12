@@ -31,6 +31,10 @@ public class ParkingLotGraph {
         return null;
     }
 
+    public void connectVertex() {
+        
+    }
+
     ///// GETTER METHODS /////
     
     public String getId() { return id; }

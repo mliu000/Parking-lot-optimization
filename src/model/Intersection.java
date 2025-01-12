@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 /*
  * @ Mu Ye Liu, Jan 2025
  * 
@@ -8,4 +10,5 @@ shortest path to find the shortest path between the entrance to the parking spot
 */
 public class Intersection {
     
+    public List<String> strings;
 }
