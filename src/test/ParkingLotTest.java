@@ -90,19 +90,19 @@ public class ParkingLotTest {
         int[] idsInOrderCar = {15, 13, 14, 16, 12, 11};
         for (int i: idsInOrderCar) {
             CarSpot spot = vacantCarSpots.poll();
-            assertEquals(i, spot.getId());
+            assertEquals(i, spot.getParkingSpotId());
         }
         PriorityQueue<MotorcycleSpot> vacantMotorcycleSpots = parkingLot.getVacantMotorcycleSpots();
         int [] idsInOrderMotorcycle = {23, 21, 22, 20, 24};
         for (int i: idsInOrderMotorcycle) {
             MotorcycleSpot spot = vacantMotorcycleSpots.poll();
-            assertEquals(i, spot.getId());
+            assertEquals(i, spot.getParkingSpotId());
         }
         PriorityQueue<CommericalSpot> vacantCommericalSpots = parkingLot.getVacantCommericalSpots();
         int [] idsInOrderCommercial = {34, 33, 32, 31};
         for (int i: idsInOrderCommercial) {
             CommericalSpot spot = vacantCommericalSpots.poll();
-            assertEquals(i, spot.getId());
+            assertEquals(i, spot.getParkingSpotId());
         }
         // Half occupies 2 car spots with motorcycles to fill the halfFullCarSpot priority queue
         // Needs to create a new parking lot without any motorcycle spots
@@ -119,8 +119,8 @@ public class ParkingLotTest {
             parkingLot2.occupySpot(licensePlates[i], 1);
         }
         parkingLot2.unoccupySpot("Y00001");
-        assertEquals(15, parkingLot2.getHalfFullCarSpots().poll().getId());
-        assertEquals(13, parkingLot2.getHalfFullCarSpots().poll().getId());
+        assertEquals(15, parkingLot2.getHalfFullCarSpots().poll().getParkingSpotId());
+        assertEquals(13, parkingLot2.getHalfFullCarSpots().poll().getParkingSpotId());
         
     }
 
@@ -232,21 +232,21 @@ public class ParkingLotTest {
         // - car
         CarSpot carSpot1 = (CarSpot) parkingLot.manuallyOccupy(12, "ACG324", false);
         checkCarSpotParameters(carSpot1, true, "ACG324", "", 0);
-        assertEquals(12, carSpot1.getId());
+        assertEquals(12, carSpot1.getParkingSpotId());
         assertFalse(parkingLot.getVacantCarSpots().contains(carSpot1));
         checkVacantSpotCounts(parkingLot, 15, 5, 5, 4, 0);
         // - motorcycle
         MotorcycleSpot motorcycleSpot1 = (MotorcycleSpot) 
                     parkingLot.manuallyOccupy(20, "Y12355", false);
         checkParkingSpotParameters(motorcycleSpot1, true, "Y12355");
-        assertEquals(20, motorcycleSpot1.getId());
+        assertEquals(20, motorcycleSpot1.getParkingSpotId());
         assertFalse(parkingLot.getVacantMotorcycleSpots().contains(motorcycleSpot1));
         checkVacantSpotCounts(parkingLot, 15, 5, 4, 4, 0);
         // - commercial 
         CommericalSpot commercialSpot1 = (CommericalSpot) 
                     parkingLot.manuallyOccupy(31, "GE3244", false);
         checkParkingSpotParameters(commercialSpot1, true, "GE3244");
-        assertEquals(31, commercialSpot1.getId());
+        assertEquals(31, commercialSpot1.getParkingSpotId());
         assertFalse(parkingLot.getVacantCommericalSpots().contains(commercialSpot1));
         checkVacantSpotCounts(parkingLot, 15, 5, 4, 3, 0);
         // Case 2: attempt to occupy empty car spot with motorcycle

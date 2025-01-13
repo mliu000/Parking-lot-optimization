@@ -28,7 +28,7 @@ public class CommercialSpotTest {
     public void constructorTest() {
         assertEquals(10, commericalSpot.getDistance(), 0.001); // Due to double rounding errors
         assertFalse(commericalSpot.getOccupiedStatus());
-        assertEquals(100, commericalSpot.getId());
+        assertEquals(100, commericalSpot.getParkingSpotId());
         assertEquals("", commericalSpot.getLicensePlate());
     }
 

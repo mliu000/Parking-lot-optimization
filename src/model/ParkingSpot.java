@@ -16,14 +16,14 @@ public abstract class ParkingSpot {
     protected String licensePlate;
 
     // Number/Id of the parking spot
-    protected final int id;
+    protected int parkingSpotId;
 
     /*
      * distance from the entrance (units are not specified as it is context
      * Cannot be changed as specific units of measurement are not relevant. Also the
      * location of the parking spot to the entrance will not change.
      */
-    protected final double distance;
+    protected double distance;
 
     // True of parking spot is occupied, false otherwise.
     protected boolean occupied;
@@ -32,8 +32,8 @@ public abstract class ParkingSpot {
      * Constructs a new empty parking spot with given id, distance from entrance,
      * and unoccupied status
      */
-    public ParkingSpot(int id, double distance) {
-        this.id = id;
+    public ParkingSpot(int parkingSpotId, double distance) {
+        this.parkingSpotId = parkingSpotId;
         this.distance = distance;
         this.licensePlate = "";
         this.occupied = false;
@@ -56,7 +56,7 @@ public abstract class ParkingSpot {
     ///// GETTER METHODS /////
 
     public double getDistance() { return distance; }
-    public int getId() { return id; }
+    public int getParkingSpotId() { return parkingSpotId; }
     public boolean getOccupiedStatus() { return occupied; }
     public String getLicensePlate() { return licensePlate; }
 }

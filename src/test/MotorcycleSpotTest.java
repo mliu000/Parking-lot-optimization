@@ -33,7 +33,7 @@ public class MotorcycleSpotTest {
     public void constructorTest() {
         assertEquals(10, motorcycleSpot.getDistance(), 0.001); // Due to double rounding errors
         assertFalse(motorcycleSpot.getOccupiedStatus());
-        assertEquals(100, motorcycleSpot.getId());
+        assertEquals(100, motorcycleSpot.getParkingSpotId());
         assertEquals("", motorcycleSpot.getLicensePlate());
     }
 

@@ -33,7 +33,7 @@ public class CarSpotTest {
     @Test
     public void testConstructor() {
         assertEquals(52.3, carSpot.getDistance(), 0.001);
-        assertEquals(123, carSpot.getId());
+        assertEquals(123, carSpot.getParkingSpotId());
 
         checkParametersOfCarSpot(carSpot, false, "", "", 0);
     }
