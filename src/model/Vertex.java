@@ -1,9 +1,6 @@
 package model;
 
-import java.util.LinkedList;
-
-import utility.Pair;
-
+import java.util.HashMap;
 /*
  @ Mu Ye Liu, Jan 2025
 
@@ -22,23 +19,24 @@ public abstract class Vertex {
     private Vertex predecessor;
 
     /*
-     * Uses a linked list to store adjacent vertices to ensure better runtime for insert and removal
-     * The integer in the pair stores the distance between vertices, and the 
+     * Uses a Hashmap to store adjacent vertices for better runtime for insert and removal, and search
+     * The integer value stores the distance between vertices, and the Vertex key is the adj vertex.
+     * Hashmap also ensures there are no double edges
      */
-    private LinkedList<Pair<Integer, Vertex>> adjacentVertices;
+    private HashMap<Vertex, Integer> adjacentVertices;
 
     // Creates a new vertex with given id, distance set to inf, no predecessor, and empty adj list.
     public Vertex(String id) {
         this.id = id;
         this.distance = Double.POSITIVE_INFINITY;
         this.predecessor = null;
-        this.adjacentVertices = new LinkedList<>();
+        this.adjacentVertices = new HashMap<>();
     }
 
     ///// GETTER METHODS /////
     
     public String getId() { return id; };
-    public LinkedList<Pair<Integer, Vertex>> getAdjacentVertices() { return adjacentVertices; }
+    public HashMap<Vertex, Integer> getAdjacentVertices() { return adjacentVertices; }
     public Double getDistance() { return distance; }
     public Vertex getPredecessor() { return predecessor; }
     
